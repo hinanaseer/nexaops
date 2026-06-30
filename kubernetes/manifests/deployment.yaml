@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexaops-backend
+  namespace: default
+  labels:
+    app: nexaops-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nexaops-backend
+  template:
+    metadata:
+      labels:
+        app: nexaops-backend
+    spec:
+      containers:
+        - name: nexaops-backend
+          image: nexaops-backend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          env:
+            - name: AI_MODE
+              value: "mock"
+            - name: APP_ENV
+              value: "production"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
