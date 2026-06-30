@@ -1,0 +1,44 @@
+name: NexaOps CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      - name: Verify FastAPI app imports correctly
+        run: |
+          cd backend
+          python -c "from app.main import app; print('App loaded successfully')"
+
+  build-docker:
+    needs: test-backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          cd backend
+          docker build -t nexaops-backend:${{ github.sha }} .
+
+      - name: Verify image was built
+        run: docker images | grep nexaops-backend
