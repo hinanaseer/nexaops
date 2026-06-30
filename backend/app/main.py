@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from app.api.diagnosis import router as diagnosis_router
+from app.api.drift import router as drift_router
 import os
 
 load_dotenv()
@@ -20,6 +21,7 @@ app.add_middleware(
 )
 
 app.include_router(diagnosis_router)
+app.include_router(drift_router)
 
 @app.get("/health")
 async def health_check():
